@@ -1,0 +1,12 @@
+[package]
+edition = "2024"
+name = "yaws-embassy-rp235x-generate-cert-data"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[features]
+
+[dependencies]
+pem-rfc7468 = { version = "1", default-features = false, features = ["alloc"] }
+sec1 = { version = "0.8", default-features = false, features = ["der"] }
