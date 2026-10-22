@@ -150,6 +150,8 @@ checksum = "f41c3356dcfd6d77fe8a2c437079760cc44b1370b579dea360b5637eb995411f"
 [[package]]
 name = "blueprint-h11spec"
 version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5aa4ee3aa1e61b4163b09a269edef73414a6dd924964d434535e62c80dbe01c3"
 dependencies = [
  "blueprint",
  "h11types",
@@ -949,6 +951,8 @@ dependencies = [
 [[package]]
 name = "h11types"
 version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07fcc99d2e41f74ffb0a36c3d3d472c80956192ccfffdcfff67844d2cb62b0a3"
 dependencies = [
  "logos 0.16.1",
  "yuri",
@@ -2052,6 +2056,8 @@ dependencies = [
 [[package]]
 name = "yaws-app-rick-roll"
 version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "797314e3ed1bfa2c020eb72ee5f5e127402b77412cfcfe181740c9125ec95457"
 dependencies = [
  "blueprint-h11spec",
  "itoa",
