@@ -16,7 +16,7 @@ const CA_BYTES: &'static [u8] = include_bytes!("../../test_certs/ca_data.bin");
 const CERT_BYTES: &'static [u8] = include_bytes!("../../test_certs/cert_data.bin");
 const KEY_BYTES: &'static [u8] = include_bytes!("../../test_certs/key_data.bin");
 
-pub(super) struct TlsServerConfig;
+pub struct TlsServerConfig;
 
 impl TlsServerCtxConfig for TlsServerConfig {
     #[inline]

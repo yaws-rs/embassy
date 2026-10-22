@@ -6,6 +6,7 @@
 #![allow(async_fn_in_trait)]
 
 mod ab_io;
+pub(crate) mod bp_known;
 mod bp_https;
 
 use crate::ab_io::{AbIoLeft, AbIoRight};
@@ -24,7 +25,7 @@ use embassy_rp::gpio::{Level, Output};
 use embassy_rp::peripherals::{DMA_CH0, DMA_CH1, PIO0};
 use embassy_rp::pio::{InterruptHandler, Pio};
 use embassy_rp::{bind_interrupts, dma};
-use embassy_time::Duration;
+use embassy_time::{Duration, Timer};
 use embedded_io_async::Write;
 use panic_probe as _;
 use static_cell::StaticCell;
@@ -32,7 +33,18 @@ use static_cell::StaticCell;
 bind_interrupts!(struct Irqs {
     PIO0_IRQ_0 => InterruptHandler<PIO0>;
     DMA_IRQ_0 => dma::InterruptHandler<DMA_CH0>, dma::InterruptHandler<DMA_CH1>;
+//    USBCTRL_IRQ => usb::InterruptHandler<USB>;
 });
+
+/*
+use embassy_rp::{peripherals::USB, usb};
+
+#[embassy_executor::task]
+async fn logger_task(usb: embassy_rp::Peri<'static, embassy_rp::peripherals::USB>) {
+    let driver = embassy_rp::usb::Driver::new(usb, Irqs);
+    embassy_usb_logger::run!(1024, log::LevelFilter::Info, driver);
+}
+*/
 
 #[embassy_executor::task]
 async fn cyw43_task(
@@ -60,6 +72,9 @@ async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
     let mut rng = RoscRng;
 
+    //spawner.spawn(unwrap!(logger_task(p.USB)));
+    //log::info!("I'm here");
+    
     let fw = aligned_bytes!("../cyw43-firmware/43439A0.bin");
     let clm = aligned_bytes!("../cyw43-firmware/43439A0_clm.bin");
     let nvram = aligned_bytes!("../cyw43-firmware/nvram_rp2040.bin");
@@ -132,18 +147,17 @@ async fn main(spawner: Spawner) {
 
     // And now we can use it!
 
-    let mut rx_buffer = [0; 8192];
-    let mut tx_buffer = [0; 8192];
-    //let mut buf_in = [0; 8192];
-    //let mut buf_out = [0; 8192];
+    let mut rx_buffer = [0; 4096];
+    let mut tx_buffer = [0; 4096];
 
     let mut left = AbIoLeft::default();
-    let mut _right = AbIoRight::default();
+    let mut right = AbIoRight::default();
 
     let mut listener = unwrap!(TcpListener::new(stack));
     unwrap!(listener.listen(1234));
 
     loop {
+        //log::info!("Waiting connections");
         control.gpio_set(0, false).await;
         info!("Listening on TCP:1234...");
         let token = match listener.accept().await {
@@ -153,33 +167,100 @@ async fn main(spawner: Spawner) {
                 continue;
             }
         };
+        //log::info!("Accepted");
         let mut socket = unwrap!(TcpSocket::new(stack, &mut rx_buffer, &mut tx_buffer));
         socket.set_timeout(Some(Duration::from_secs(10)));
         if let Err(e) = socket.accept(token).await {
             warn!("accept error: {:?}", e);
+            //log::info!("Err = {:?}", e);
             continue;
         }
 
         info!("Received connection from {:?}", socket.remote_addr());
         control.gpio_set(0, true).await;
 
+        //log::info!("Loading BP");
+        let mut bp = bp_https::ytls_server_blueprints();
+        //log::info!("Done.");
+        
+        let mut app_ready = false;
+
+        //log::info!("Entering loop");
+        let mut read_in_last: Option<usize> = None;
+        
         loop {
-            let n = match socket.read(&mut left.in_bytes).await {
+
+            Timer::after_millis(100).await;
+            //log::info!("Reading..");
+            
+            let n_try = match socket.try_read(&mut left.in_bytes[left.in_bytes_len..]) {
                 Ok(0) => {
-                    warn!("read EOF");
+                    //log::warn!("read EOF");
                     break;
                 }
-                Ok(n) => n,
+                Ok(n) => Some(n),
+                Err(embassy_net::TryError::WouldBlock) => None,
                 Err(e) => {
-                    warn!("read error: {:?}", e);
+                    //log::warn!("read error: {:?}", e);
                     break;
                 }
             };
-            left.in_bytes_len += n;
+            //log::info!("Read {:?} bytes", n_try);
+            read_in_last = n_try;
+            if let Some(n) = n_try {
+                left.in_bytes_len += n;
+            }
+            Timer::after_millis(100).await;
+            
+            struct NothingBurger;
+            use blueprint::{Left, Orbit, NoRight};
 
-            // KTODO
+            let mut pending_out = 0;
 
-            match socket
+            let left_lens = left.left_lens();
+            //log::info!("Pre/Left lens = {:?}", left_lens);
+            
+            let layers = bp.layers_as_mut();
+            let _pos = layers[0].advance_with(&mut NothingBurger, &mut left, &mut right);
+            
+            let left_lens = left.left_lens();
+            pending_out += left_lens.1;
+
+            Timer::after_millis(100).await;
+            
+            //log::info!("Post/Left lens = {:?}", left_lens);
+            //log::info!("Right.in_bytes_len = {} app_ready = {} left.is_ready = {}", right.in_bytes_len, app_ready, left.is_ready());
+            Timer::after_millis(100).await;
+            
+            if left.is_ready() || app_ready {
+                //log::info!("Request? {}", unwrap!(core::str::from_utf8(&right.in_bytes[..right.in_bytes_len])));
+                Timer::after_millis(500).await;
+                app_ready = true;
+                let mut app_left = right.impl_left();
+                let app = bp.app_as_mut();
+
+                let app_left_lens = app_left.left_lens();
+                //log::info!("Pre/App Left lens = {:?}", app_left_lens);
+                Timer::after_millis(100).await;
+                                
+                let _pos = app.advance_with(&mut NothingBurger, &mut app_left, &mut NoRight);
+                Timer::after_millis(100).await;
+                
+                let app_left_lens = app_left.left_lens();
+                //log::info!("Post/App Left lens = {:?}", app_left_lens);
+                Timer::after_millis(100).await;
+                pending_out += app_left_lens.1;
+            }
+            
+            if pending_out == 0 {
+                Timer::after_millis(100).await;
+                continue;
+            }
+
+            //log::info!("Sending out all {}", left.out_bytes_len);
+            Timer::after_millis(100).await;            
+            
+            match socket                
                 .write_all(&left.out_bytes[..left.out_bytes_len])
                 .await
             {
@@ -189,8 +270,14 @@ async fn main(spawner: Spawner) {
                     break;
                 }
             };
-            left.out_bytes = [0; 8192];
+
+            //log::info!("Sent all out.");
+            Timer::after_millis(100).await;            
+            
+            left.out_bytes = [0; 4096];
             left.out_bytes_len = 0;
+
+            
         }
     }
 }

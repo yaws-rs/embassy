@@ -4,9 +4,9 @@ pub use blueprint::{InBuffer, Left, Right};
 
 /// A/B I/O Left side
 pub struct AbIoLeft {
-    pub in_bytes: [u8; 8192],
+    pub in_bytes: [u8; 4096],
     pub in_bytes_len: usize,
-    pub out_bytes: [u8; 8192],
+    pub out_bytes: [u8; 4096],
     pub out_bytes_len: usize,
     blocked: bool,
     ready: bool,
@@ -18,9 +18,9 @@ pub struct AbIoLeft {
 impl Default for AbIoLeft {
     fn default() -> Self {
         Self {
-            in_bytes: [0; 8192],
+            in_bytes: [0; 4096],
             in_bytes_len: 0,
-            out_bytes: [0; 8192],
+            out_bytes: [0; 4096],
             out_bytes_len: 0,
             blocked: false,
             ready: false,
@@ -105,9 +105,9 @@ impl Left for AbIoLeft {
 
 /// A/B I/O Right side
 pub struct AbIoRight {
-    pub in_bytes: [u8; 8192],
+    pub in_bytes: [u8; 4096],
     pub in_bytes_len: usize,
-    pub out_bytes: [u8; 8192],
+    pub out_bytes: [u8; 4096],
     pub out_bytes_len: usize,
     pub want_right_next_in: bool,
 
@@ -120,7 +120,7 @@ pub struct AbIoRight {
 }
 
 impl AbIoRight {
-    fn impl_left(&mut self) -> impl Left + use<'_> {
+    pub fn impl_left(&mut self) -> impl Left + use<'_> {
         self
     }
 }
@@ -128,9 +128,9 @@ impl AbIoRight {
 impl Default for AbIoRight {
     fn default() -> Self {
         Self {
-            in_bytes: [0; 8192],
+            in_bytes: [0; 4096],
             in_bytes_len: 0,
-            out_bytes: [0; 8192],
+            out_bytes: [0; 4096],
             out_bytes_len: 0,
             want_right_next_in: false,
             left_blocked: false,
@@ -161,7 +161,7 @@ impl Right for AbIoRight {
     }
     /// SM: Called when all Right side Output was consumed
     fn all_sent_right_out(&mut self) -> () {
-        self.out_bytes = [0; 8192];
+        self.out_bytes = [0; 4096];
         self.out_bytes_len = 0;
     }
     /// Add bytes to Right output

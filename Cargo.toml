@@ -7,25 +7,40 @@ license = "MIT OR Apache-2.0"
 publish = false
 
 [features]
-default = ["rp235xa"]
+#rp2040
+default = []
+#rp235x
+#default = ["rp235xa"]
 rp235xa = ["embassy-rp/rp235xa"]
 rp235xb = ["embassy-rp/rp235xb"]
 
 [dependencies]
 blueprint = { version = "0.2.0", default-features = false }
 blueprint-ytls = { version = "0.0.1", default-features = false, features = ["server", "zeroize"] }
-blueprints-known = { version = "0.2", default-features = false, features = ["h11server", "ytls-server"] }
-blueprint-h11spec = { version = "0.0.4", default-features = false, features = ["h11server"] }
+#blueprints-known = { version = "0.2", default-features = false, features = ["h11server", "ytls-server"] }
+blueprint-h11spec = { path = "../h11spec/blueprint", version = "0.0.4", default-features = false, features = ["h11server"] }
 ytls-rustcrypto = { version = "0.0.3", default-features = false }
 #yaws-app-mirror = { path = "../../../h11spec/apps/mirror", default-features = false }
-yaws-app-rick-roll = { version = "0.0.4", default-features = false }
+yaws-app-rick-roll = { path = "../h11spec/apps/rick_roll", version = "0.0.4", default-features = false }
 embassy-executor = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt"] }
 embassy-time = { version = "0.5.1", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "defmt-timestamp-uptime"] }
-embassy-rp = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "binary-info", "executor-thread", "executor-interrupt"] }
 embassy-net = { version = "0.9.1", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "tcp", "tcp-listener", "udp", "raw-ethernet", "raw-ip", "dhcpv4", "dhcpv4-server", "medium-ethernet", "dns", "icmp-ping-reply"] }
 cyw43 = { version = "0.7.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "firmware-logs"] }
 cyw43-pio = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt"] }
 #embassy-futures = { version = "0.1.2", git = "https://github.com/embassy-rs/embassy.git" }
+#portable-atomic = { version = "1", default-features = false, features = ["critical-section"] }
+
+#RP235x
+#embassy-rp = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "binary-info", "executor-thread", "executor-interrupt"] }
+
+#RP2340
+embassy-rp = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp2040", "executor-thread", "executor-interrupt"] }
+
+# rp2340
+portable-atomic = { version = "1.5", features = ["critical-section"] }
+
+#embassy-usb-logger = { version = "0.6", git = "https://github.com/embassy-rs/embassy.git" }
+#log = "0.4"
 
 defmt = "1.0.1"
 defmt-rtt = "1.0.0"
@@ -37,7 +52,7 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 heapless = "0.9"
 
 embedded-io-async = { version = "0.7.0", features = ["defmt"] }
-static_cell = "2.1"
+static_cell = { version = "2.1" }
 
 #[profile.release]
 # Enable generation of debug symbols even on release builds

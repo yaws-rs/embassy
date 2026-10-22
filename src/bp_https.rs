@@ -4,17 +4,17 @@ mod ytls;
 
 use blueprint::Orbit;
 use blueprint_h11spec::H11Serving;
-use blueprints_known::Orbits;
+use crate::bp_known::Orbits;
 
 use embassy_rp::clocks::RoscRng;
 use yaws_app_rick_roll::RickRoll;
-use ytls::TlsServerConfig;
+pub use ytls::TlsServerConfig;
 use ytls_rustcrypto::RustCrypto;
 
 /// Set this to your version of Rick in his pure form
-const RICK_BYTES: &'static [u8] = include_bytes!("/tmp/rick-roll.gif");
+const RICK_BYTES: &'static [u8] = include_bytes!("/tmp/rick-roll.txt");
 
-fn ytls_server_blueprints() -> Blueprints<1, Orbits<TlsServerConfig, RustCrypto, RoscRng, RickRoll>>
+pub fn ytls_server_blueprints() -> Blueprints<1, Orbits<TlsServerConfig, RustCrypto, RoscRng, RickRoll>>
 {
     let rick: RickRoll = RickRoll::with_rick(RICK_BYTES);
     BlueprintsLayers::<1>::layers([Orbits::YtlsServer(ytls::init_ytls_server())])
