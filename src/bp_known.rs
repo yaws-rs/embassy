@@ -1,6 +1,6 @@
 //! Known blueprints enum-dispatch
 
-pub use blueprint::{Left, NoLeft, NoRight, Orbit, Right};
+pub use blueprint::{Left, Orbit, Right};
 
 use blueprint_ytls::{CryptoConfig, CryptoRng, TlsServerCtxConfig};
 

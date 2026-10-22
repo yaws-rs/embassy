@@ -2,7 +2,6 @@
 
 use blueprint_ytls::{Alpn, TlsServerCtxConfig, TlsServerOrbit};
 use embassy_rp::clocks::RoscRng;
-use heapless::Vec;
 use ytls_rustcrypto::RustCrypto;
 
 pub fn init_ytls_server() -> TlsServerOrbit<TlsServerConfig, RustCrypto, RoscRng> {

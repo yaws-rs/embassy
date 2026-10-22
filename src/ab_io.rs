@@ -4,9 +4,9 @@ pub use blueprint::{InBuffer, Left, Right};
 
 /// A/B I/O Left side
 pub struct AbIoLeft {
-    pub in_bytes: [u8; 4096],
+    pub in_bytes: [u8; 8192],
     pub in_bytes_len: usize,
-    pub out_bytes: [u8; 4096],
+    pub out_bytes: [u8; 8192],
     pub out_bytes_len: usize,
     blocked: bool,
     ready: bool,
@@ -18,9 +18,9 @@ pub struct AbIoLeft {
 impl Default for AbIoLeft {
     fn default() -> Self {
         Self {
-            in_bytes: [0; 4096],
+            in_bytes: [0; 8192],
             in_bytes_len: 0,
-            out_bytes: [0; 4096],
+            out_bytes: [0; 8192],
             out_bytes_len: 0,
             blocked: false,
             ready: false,
@@ -69,7 +69,7 @@ impl Left for AbIoLeft {
     /// Mutable Input and Output bufs of Left side
     fn left_bufs_mut<'d>(&'d mut self) -> (InBuffer<'d>, &'d mut [u8]) {
         let b_buf_in = &mut self.in_bytes[..self.in_bytes_len];
-        let b_buf_out = &mut self.out_bytes;
+        let b_buf_out = &mut self.out_bytes[self.out_bytes_len..];
         (InBuffer::Single(b_buf_in), b_buf_out)
     }
     /// Indicates whether the Left side is ready for Right side
@@ -105,9 +105,9 @@ impl Left for AbIoLeft {
 
 /// A/B I/O Right side
 pub struct AbIoRight {
-    pub in_bytes: [u8; 4096],
+    pub in_bytes: [u8; 8192],
     pub in_bytes_len: usize,
-    pub out_bytes: [u8; 4096],
+    pub out_bytes: [u8; 8192],
     pub out_bytes_len: usize,
     pub want_right_next_in: bool,
 
@@ -128,9 +128,9 @@ impl AbIoRight {
 impl Default for AbIoRight {
     fn default() -> Self {
         Self {
-            in_bytes: [0; 4096],
+            in_bytes: [0; 8192],
             in_bytes_len: 0,
-            out_bytes: [0; 4096],
+            out_bytes: [0; 8192],
             out_bytes_len: 0,
             want_right_next_in: false,
             left_blocked: false,
@@ -161,7 +161,7 @@ impl Right for AbIoRight {
     }
     /// SM: Called when all Right side Output was consumed
     fn all_sent_right_out(&mut self) -> () {
-        self.out_bytes = [0; 4096];
+        self.out_bytes = [0; 8192];
         self.out_bytes_len = 0;
     }
     /// Add bytes to Right output
@@ -218,7 +218,7 @@ impl Left for &mut AbIoRight {
     /// Mutable Input and Output bufs of Left side
     fn left_bufs_mut<'d>(&'d mut self) -> (InBuffer<'d>, &'d mut [u8]) {
         let b_buf_in = &mut self.in_bytes[..self.in_bytes_len];
-        let b_buf_out = &mut self.out_bytes;
+        let b_buf_out = &mut self.out_bytes[self.out_bytes_len..];
         (InBuffer::Single(b_buf_in), b_buf_out)
     }
     /// Indicates whether the Left side is ready for Right side

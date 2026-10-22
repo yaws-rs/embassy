@@ -2,20 +2,20 @@
 
 mod ytls;
 
+use crate::bp_known::Orbits;
 use blueprint::Orbit;
 use blueprint_h11spec::H11Serving;
-use crate::bp_known::Orbits;
 
 use embassy_rp::clocks::RoscRng;
 use yaws_app_rick_roll::RickRoll;
 pub use ytls::TlsServerConfig;
 use ytls_rustcrypto::RustCrypto;
 
-/// Set this to your version of Rick in his pure form
-const RICK_BYTES: &'static [u8] = include_bytes!("/tmp/rick-roll.txt");
+/// Set this to your version of Rick in his text form
+const RICK_BYTES: &'static [u8] = include_bytes!("../assets/rick-roll.txt");
 
-pub fn ytls_server_blueprints() -> Blueprints<1, Orbits<TlsServerConfig, RustCrypto, RoscRng, RickRoll>>
-{
+pub fn ytls_server_blueprints()
+-> Blueprints<1, Orbits<TlsServerConfig, RustCrypto, RoscRng, RickRoll>> {
     let rick: RickRoll = RickRoll::with_rick(RICK_BYTES);
     BlueprintsLayers::<1>::layers([Orbits::YtlsServer(ytls::init_ytls_server())])
         .app(Orbits::H11Server(H11Serving::with_app(rick)))
@@ -37,10 +37,12 @@ impl<const LAYERS: usize, O: Orbit> Blueprints<LAYERS, O> {
         &mut self.app
     }
     /// Count of all LAYERS +1 App
+    #[allow(dead_code)]
     pub fn count_all_layers(&self) -> usize {
         self.layers.len() + 1
     }
     /// Iterate mutable non-App layers
+    #[allow(dead_code)]
     pub fn layers_iter_mut<'a>(&'a mut self) -> impl Iterator + use<'a, LAYERS, O> {
         self.layers.iter_mut()
     }
@@ -55,6 +57,7 @@ impl<const LAYERS: usize> BlueprintsLayers<LAYERS> {
         BlueprintsNeedApp { layers: orbits }
     }
     /// No intermediate layers involved
+    #[allow(dead_code)]
     pub fn no_layers<O: Orbit>() -> BlueprintsNeedApp<0, O> {
         BlueprintsNeedApp { layers: [] }
     }
