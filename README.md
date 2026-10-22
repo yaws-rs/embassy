@@ -10,11 +10,15 @@ It creates an open WiFi Access Point with SSID Rick-Roll and provides default re
 
 ### Usage
 
+Add `test.rustcryp.to` in hosts file / relevant in the host that you are using a client from to resolve to IPv4 address `10.0.0.1`.
+
 Generate TLS Certificates & Key material with OpenSSL
 ```ignore
 cd test_certs
 make prime256v1
 ```
+
+Add the generated CA Certificate `ca.prime256v1.crt` into your client hosts root cert store as trusted.
 
 Convert the above material into correct form
 ```ignore
