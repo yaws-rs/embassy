@@ -3,8 +3,8 @@
 This is an example how to run [YAWS](https://yaws-rs.github.io/book/) in [Embassy](https://embassy.dev/) embedded framework.
 
 Supported embedded targets:
-- Raspberry Pico W 2040
-- Raspberry Pico W 2350
+- Raspberry Pico W or "2040" (default)
+- Raspberry Pico 2W or "2530" (Use files from rp235x)
 
 It creates an open WiFi Access Point with SSID Rick-Roll and provides default response to any HTTPS request at https://test.rustcryp.to:1234/
 
@@ -30,14 +30,23 @@ NOTE: Due to embedded setup you will need to set up the target manually to your 
 
 See rust [target list](https://doc.rust-lang.org/beta/rustc/platform-support.html).
 
+Build
+```
+cargo build
+```
+
+### Run
+
 Configure the runner:
 ```ignore
 vi .cargo/config.toml
 ```
 
-If you have a debug probe use probe-rs and if not, use the picotool and press BOOTSEL before connecting the Pico into USB.
+If you have a debug probe use [probe-rs](https://probe.rs) and if not then use the [picotool](https://github.com/raspberrypi/picotool) without a debugger directly USB attached.
 
-Run
+If you use picotool (without debugger) press BOOTSEL before connecting the Pico into USB in the host programmer.
+
+Run to program (and attach with RTT if using debugger)
 ```ignore
 cargo run
 ```
