@@ -17,13 +17,14 @@ rp235xb = ["embassy-rp/rp235xb"]
 [dependencies]
 blueprint = { version = "0.2.0", default-features = false }
 blueprint-ytls = { version = "0.0.1", default-features = false, features = ["server", "zeroize"] }
-#blueprint-h11spec = { version = "0.0.5", default-features = false, features = ["h11server"] }
-blueprint-h11spec = { path = "../h11spec/blueprint", version = "0.0.5", default-features = false, features = ["h11server"] }
-#blueprints-known = { version = "0.2", default-features = false, features = ["h11server", "ytls-server"] }
+blueprint-h11spec = { version = "0.0.5", default-features = false, features = ["h11server"] }
 ytls-rustcrypto = { version = "0.0.3", default-features = false }
+yaws-app-rick-roll = { version = "0.0.5", default-features = false }
+# local dev
+#yaws-app-rick-roll = { path = "../h11spec/apps/rick_roll", version = "0.0.5", default-features = false }
+#blueprint-h11spec = { path = "../h11spec/blueprint", version = "0.0.5", default-features = false, features = ["h11server"] }
+#blueprints-known = { version = "0.2", default-features = false, features = ["h11server", "ytls-server"] }
 #yaws-app-mirror = { path = "../../../h11spec/apps/mirror", default-features = false }
-#yaws-app-rick-roll = { version = "0.0.5", default-features = false }
-yaws-app-rick-roll = { path = "../h11spec/apps/rick_roll", version = "0.0.5", default-features = false }
 embassy-executor = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt"] }
 embassy-time = { version = "0.5.1", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "defmt-timestamp-uptime"] }
 embassy-net = { version = "0.9.1", git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "tcp", "tcp-listener", "udp", "raw-ethernet", "raw-ip", "dhcpv4", "dhcpv4-server", "medium-ethernet", "dns", "icmp-ping-reply"] }
